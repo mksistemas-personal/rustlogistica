@@ -10,7 +10,7 @@ pub enum DocumentError {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = "type", content = "identity")]
+#[serde(tag = "type", content = "identifier")]
 pub enum DocumentType {
     Cnpj(String),
     Cpf(String),
@@ -39,7 +39,7 @@ impl DocumentType {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Document {
-    #[serde(rename = "type")]
+    #[serde(rename = "doc_type")]
     pub doc_type: DocumentType,
     #[serde(rename = "description")]
     pub description: Option<String>,
