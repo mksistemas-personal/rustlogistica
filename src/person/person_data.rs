@@ -40,7 +40,8 @@ mod tests {
     #[test]
     fn test_person_request_valid() {
         let doc = Document::new(
-            DocumentType::Cpf("11144477735".to_string()),
+            DocumentType::Cpf,
+            "11144477735".to_string(),
             None,
         );
         let req = PersonRequest::new("João".to_string(), doc);
@@ -50,7 +51,8 @@ mod tests {
     #[test]
     fn test_person_request_empty_name() {
         let doc = Document::new(
-            DocumentType::Cpf("11144477735".to_string()),
+            DocumentType::Cpf,
+            "11144477735".to_string(),
             None,
         );
         let req = PersonRequest::new("".to_string(), doc);
@@ -65,7 +67,8 @@ mod tests {
     #[test]
     fn test_person_request_invalid_document() {
         let doc = Document::new(
-            DocumentType::Cpf("123".to_string()),
+            DocumentType::Cpf,
+            "123".to_string(),
             None,
         );
         let req = PersonRequest::new("João".to_string(), doc);

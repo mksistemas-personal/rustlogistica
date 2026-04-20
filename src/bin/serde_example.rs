@@ -27,7 +27,8 @@ fn main() {
     // --- Exemplo com Document (CPF) ---
     println!("\n--- Exemplo com Document (CPF) ---");
     let doc_cpf = Document::new(
-        DocumentType::Cpf("11144477735".to_string()),
+        DocumentType::Cpf,
+        "11144477735".to_string(),
         Some("CPF do João".to_string()),
     );
 
@@ -40,7 +41,8 @@ fn main() {
     // --- Exemplo com Document (CNPJ) ---
     println!("\n--- Exemplo com Document (CNPJ) ---");
     let doc_cnpj = Document::new(
-        DocumentType::Cnpj("11222333000181".to_string()),
+        DocumentType::Cnpj,
+        "11222333000181".to_string(),
         None,
     );
 
@@ -53,7 +55,8 @@ fn main() {
     // --- Exemplo com Document (Nulo) ---
     println!("\n--- Exemplo com Document (Descrição Nula) ---");
     let doc_null = Document::new(
-        DocumentType::Cpf("52998224725".to_string()),
+        DocumentType::Cpf,
+        "52998224725".to_string(),
         None,
     );
 

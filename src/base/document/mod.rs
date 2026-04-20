@@ -3,34 +3,33 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum DocumentError {
-    #[error("CPF inválido: {0}")]
-    InvalidCpf(String),
-    #[error("CNPJ inválido: {0}")]
-    InvalidCnpj(String),
+    #[error("person.cpf.invalid")]
+    InvalidCpf,
+    #[error("Cperson.cnpj.invalid")]
+    InvalidCnpj,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = "type", content = "identifier")]
 pub enum DocumentType {
-    Cnpj(String),
-    Cpf(String),
+    Cnpj,
+    Cpf,
 }
 
 impl DocumentType {
-    pub fn validate(&self) -> Result<(), DocumentError> {
+    pub fn validate(&self, identifier: &str) -> Result<(), DocumentError> {
         match self {
-            DocumentType::Cnpj(v) => {
-                if validate_cnpj(v) {
+            DocumentType::Cnpj => {
+                if validate_cnpj(identifier) {
                     Ok(())
                 } else {
-                    Err(DocumentError::InvalidCnpj(v.clone()))
+                    Err(DocumentError::InvalidCnpj)
                 }
             }
-            DocumentType::Cpf(v) => {
-                if validate_cpf(v) {
+            DocumentType::Cpf => {
+                if validate_cpf(identifier) {
                     Ok(())
                 } else {
-                    Err(DocumentError::InvalidCpf(v.clone()))
+                    Err(DocumentError::InvalidCpf)
                 }
             }
         }
@@ -39,22 +38,25 @@ impl DocumentType {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Document {
-    #[serde(rename = "doc_type")]
+    #[serde(rename = "type")]
     pub doc_type: DocumentType,
+    #[serde(rename = "identifier")]
+    pub identifier: String,
     #[serde(rename = "description")]
     pub description: Option<String>,
 }
 
 impl Document {
-    pub fn new(doc_type: DocumentType, description: Option<String>) -> Self {
+    pub fn new(doc_type: DocumentType, identifier: String, description: Option<String>) -> Self {
         Self {
             doc_type,
+            identifier,
             description,
         }
     }
 
     pub fn validate(&self) -> Result<(), DocumentError> {
-        self.doc_type.validate()
+        self.doc_type.validate(&self.identifier)
     }
 }
 
@@ -157,7 +159,8 @@ mod tests {
     #[test]
     fn test_document_struct() {
         let doc = Document::new(
-            DocumentType::Cpf("11144477735".to_string()),
+            DocumentType::Cpf,
+            "11144477735".to_string(),
             Some("CPF do João".to_string()),
         );
         assert!(doc.validate().is_ok());
@@ -167,7 +170,8 @@ mod tests {
     #[test]
     fn test_document_struct_null_description() {
         let doc = Document::new(
-            DocumentType::Cpf("11144477735".to_string()),
+            DocumentType::Cpf,
+            "11144477735".to_string(),
             None,
         );
         assert!(doc.validate().is_ok());
@@ -177,17 +181,18 @@ mod tests {
     #[test]
     fn test_serialization() {
         let doc = Document::new(
-            DocumentType::Cpf("11144477735".to_string()),
+            DocumentType::Cpf,
+            "11144477735".to_string(),
             Some("Teste de serialização".to_string()),
         );
         let json = serde_json::to_string(&doc).expect("Falha ao serializar");
         println!("JSON Gerado: {}", json);
         
-        // O JSON do DocumentType será {"type":"Cpf", "identity":"..."}
-        // O JSON do Document será {"doc_type":{"type":"Cpf","identity":"..."},"description":"..."}
+        // O JSON do DocumentType será {"type":"Cpf"}
+        // O JSON do Document será {"doc_type":{"type":"Cpf"},"identifier":"...","description":"..."}
         
         assert!(json.contains("\"type\":\"Cpf\""));
-        assert!(json.contains("\"identity\":\"11144477735\""));
+        assert!(json.contains("\"identifier\":\"11144477735\""));
         
         let doc_back: Document = serde_json::from_str(&json).expect("Falha ao desserializar");
         assert!(doc_back.validate().is_ok());

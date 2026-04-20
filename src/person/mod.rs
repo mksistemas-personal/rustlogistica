@@ -9,7 +9,7 @@ use thiserror::Error;
 pub enum PersonError {
     #[error("person.name.empty")]
     EmptyName,
-    #[error("person.document.invalid.{0}")]
+    #[error("person.document.invalid")]
     DocumentInvalid(#[from] DocumentError),
 }
 
